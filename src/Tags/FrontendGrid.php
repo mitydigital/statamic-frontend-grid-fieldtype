@@ -13,8 +13,6 @@ class FrontendGrid extends Tags
         $value = $this->context->get('value');
         $config = $value->field();
 
-        ray($config);
-
         // convert config of fields (and widths) to template of rows
         $template = [];
         $templateIndex = 0;

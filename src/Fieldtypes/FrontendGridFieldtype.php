@@ -129,7 +129,7 @@ class FrontendGridFieldtype extends Fieldtype
                     sprintf('form.errors.%s', $handle) => sprintf('form.errors[\'%s.\'+index+\'.%s\']', $fieldHandle, $handle),
                 ];
 
-                $chk = Arr::get($field, 'type') === 'radio';
+                //$chk = Arr::get($field, 'type') === 'radio';
 
                 if (Arr::get($field, 'type') === 'checkboxes') {
                     // name="X" becomes x-bind:name="FIELD_IDX_HANDLE[]"
@@ -165,11 +165,11 @@ class FrontendGridFieldtype extends Fieldtype
                     $replace[sprintf('id="%s"', $handle)] = sprintf('x-bind:id="\'%s_\'+index+\'_%s\'"', $fieldHandle, $handle);
                 }
 
-                if ($chk) {
+                /*if ($chk) {
                     ray($replace);
                     ray($remove);
                     ray($markup);
-                }
+                }*/
 
                 foreach ($replace as $search => $value) {
                     $markup = str_replace($search, $value, $markup);
@@ -179,11 +179,11 @@ class FrontendGridFieldtype extends Fieldtype
                     $markup = str_replace($search, '', $markup);
                 }
 
-                if ($chk) {
+                //if ($chk) {
                     //dd($markup);
-                }
+                //}
 
-                if (true) {
+                if (false) {
                     $identifier = sprintf('name="%s"', $handle);
                     $newIdentifier = sprintf('x-bind:name="\'%s[\'+index+\'][%s]\'"', $fieldHandle, $handle);
                     $xModel = sprintf('x-model="set.%s"', $handle);
@@ -214,7 +214,7 @@ class FrontendGridFieldtype extends Fieldtype
         // errors
         $formHandle = $this->field()->form()->handle() ?? 'default';
         $errors = session('errors') ? session('errors')->getBag(sprintf('form.%s', $formHandle)) : new MessageBag;
-        ray($errors)->red();
+
         $setErrors = collect($errors->messages())
             ->filter(fn (array $errors, string $field) => Str::startsWith($field, $fieldHandle.'.'))
             ->map(function (array $errors, string $field) use ($fieldHandle) {
@@ -263,7 +263,14 @@ class FrontendGridFieldtype extends Fieldtype
         if (in_array('required', Arr::get($this->field()->config(), 'validate', []))) {
             $fieldRules[] = 'required';
         } else {
-            $fieldRules[] = 'nullable';
+            $configuredRules = Arr::get($this->field()->config(), 'validate', []);
+            $fieldRule = 'nullable';
+            foreach($configuredRules as $configuredRule) {
+                if (Str::startsWith($configuredRule, 'required_if')) {
+                    $fieldRule = $configuredRule;
+                }
+            }
+            $fieldRules[] = $fieldRule;
         }
 
         $fieldRules[] = 'array';
