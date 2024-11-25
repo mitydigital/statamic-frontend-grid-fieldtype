@@ -259,26 +259,41 @@ class FrontendGridFieldtype extends Fieldtype
             }
         });
 
+        /*$isRequired = false;
         $fieldRules = [];
         if (in_array('required', Arr::get($this->field()->config(), 'validate', []))) {
             $fieldRules[] = 'required';
+            $isRequired = true;
         } else {
             $configuredRules = Arr::get($this->field()->config(), 'validate', []);
             $fieldRule = 'nullable';
             foreach($configuredRules as $configuredRule) {
                 if (Str::startsWith($configuredRule, 'required_if')) {
                     $fieldRule = $configuredRule;
+                    $isRequired = true;
                 }
             }
             $fieldRules[] = $fieldRule;
         }
 
-        $fieldRules[] = 'array';
-        if ($minRows = Arr::get($this->field()->config(), 'min_rows', null)) {
+        if ($isRequired) {
+            $fieldRules[] = 'array';
+        }*/
+
+        $fieldRules = Arr::get($this->field()->config(), 'validate', []);
+
+        if (!in_array('array', $fieldRules)) {
+            $fieldRules[] = 'array';
+        }
+
+        $hasMin = collect($fieldRules)->filter(fn(string $rule) => Str::startsWith($rule, 'min:'))->count() ? true : false;
+        $hasMax = collect($fieldRules)->filter(fn(string $rule) => Str::startsWith($rule, 'max:'))->count() ? true : false;
+
+        if (!$hasMin && $minRows = Arr::get($this->field()->config(), 'min_rows', null)) {
             $fieldRules[] = 'min:'.$minRows;
         }
 
-        if ($maxRows = Arr::get($this->field()->config(), 'max_rows', null)) {
+        if (!$hasMax && $maxRows = Arr::get($this->field()->config(), 'max_rows', null)) {
             $fieldRules[] = 'max:'.$maxRows;
         }
 
