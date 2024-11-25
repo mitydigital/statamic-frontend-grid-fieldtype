@@ -1,0 +1,129 @@
+{{ once }}
+<script>
+    document.addEventListener('alpine:init', () => {
+        Alpine.data('frontendGridFieldtype', () => ({
+
+            handle: null,
+            default: {},
+            errors: [],
+            sets: [],
+
+            _oldSets: [],
+
+            min: null,
+            max: null,
+
+            adding: false,
+
+            init() {
+                this.default = JSON.parse(this.$el.dataset.default);
+                this.errors = JSON.parse(this.$el.dataset.errors);
+
+                if (this.$el.dataset.old) {
+                    JSON.parse(this.$el.dataset.old).forEach((set) => {
+                        this.sets.push(Object.assign({}, set, {id: this.getId() }));
+                    });
+                }
+
+                if (parseInt(this.$el.dataset.setsMax)) {
+                    this.max = this.$el.dataset.setsMax;
+                }
+
+                if (parseInt(this.$el.dataset.setsMin)) {
+                    this.min = this.$el.dataset.setsMin;
+                }
+
+                this.handle = this.$el.dataset.handle;
+
+                this.$watch('sets', () => this.update());
+
+                this.$watch('form.errors', () => {
+                    this.errors = [];
+                    for(let field in this.form.errors) {
+                        if (field.startsWith(this.handle+'.')) {
+                            let parts = field.split('.');
+
+                            let index = parts[1];
+                            let internalField = parts[2];
+
+                            if (! this.errors[index]) {
+                                this.errors[index] = {};
+                            }
+
+                            this.errors[index][internalField] = this.form.errors[field];
+                        }
+                    }
+                })
+            },
+
+            add() {
+                this.adding = true;
+                let set = Object.assign({}, this.default, {id: this.getId() });
+                this.sets.push(set);
+            },
+
+            remove(index) {
+                this.sets.splice(index, 1);
+            },
+
+            getId() {
+                return Math.random().toString(36).substr(2, 6);
+            },
+
+            hasError(index, handle) {
+                return this.errors.hasOwnProperty(index) && this.errors[index].hasOwnProperty(handle);
+            },
+
+            update(newSets, oldSets) {
+                if (this.handle) {
+
+                    //let diff = Object.fromEntries(Object.entries(this.sets).filter(([k, v]) => this._oldSets[k] !== v))
+
+                    let diff = [];
+                    let setsById = {};
+                    this._oldSets.forEach((set) => setsById[set.id] = JSON.parse(JSON.stringify(set)));
+
+                    this.sets.forEach((set, index) => {
+                        let id = set.id;
+                        for (let property in set) {
+                            if (property !== 'id' && setsById.hasOwnProperty(id)) {
+                                let oldSet = setsById[id];
+                                let value = set[property];
+                                let oldValue = oldSet[property];
+
+                                if (Array.isArray(value)) {
+                                    value = value.sort().join(',');
+                                    oldValue = oldValue.sort().join(',');
+                                }
+
+                                if (oldValue !== value) {
+                                    diff.push(this.handle + '.' + index + '.' + property);
+                                }
+                            }
+                        }
+                    });
+
+                    this.form[this.handle] = this.sets;
+                    this.form.touch(this.handle); // needed to trigger
+                    this.$nextTick(() => {
+                        if (!this.adding) {
+                            diff.forEach(property => this.form.validate(property))
+                        }
+                        this.adding = false;
+
+                        this._oldSets = JSON.parse(JSON.stringify(this.sets));
+                    });
+                }
+            },
+
+            get canAddSet() {
+                if (!this.max) {
+                    return true;
+                }
+                return this.sets.length < this.max;
+            }
+
+        }))
+    });
+</script>
+{{ /once }}

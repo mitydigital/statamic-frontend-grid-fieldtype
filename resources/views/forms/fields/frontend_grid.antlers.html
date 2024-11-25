@@ -1,0 +1,80 @@
+
+<div x-data="frontendGridFieldtype"
+     data-default="{{ set_default | to_json | entities }}"
+     data-old="{{ (old ?? []) | to_json | entities }}"
+     data-sets-max="{{ max_rows }}"
+     data-sets-min="{{ min_rows }}"
+     data-handle="{{ handle }}"
+     data-errors="{{ (set_errors ?? []) | to_json | entities }}">
+
+    {{ _fieldHandle = handle }}
+
+    <div class="gap-x-4"
+         :class="{ 'py-4' : sets.length }">
+        <template x-for="(set, index) in sets" :key="set.id">
+            <div class="flex">
+
+                {{# SET LAYOUT #}}
+                <div class="flex-grow grid grid-cols-1 gap-y-2 gap-x-2 sm:grid-cols-12">
+                {{ set_fields | scope('_field') }}
+
+                    {{ _widthClass = '' }}
+                    {{ _widthClass = switch(
+                    (_field:width == '100') => 'sm:col-span-12',
+                    (_field:width == '75') => 'sm:col-span-9',
+                    (_field:width == '66') => 'sm:col-span-8',
+                    (_field:width == '50') => 'sm:col-span-6',
+                    (_field:width == '33') => 'sm:col-span-4',
+                    (_field:width == '25') => 'sm:col-span-3',
+                    () => 'w-full' )
+                    }}
+
+                    <div class="{{ _widthClass }}">
+                        {{ if _field:type !== 'spacer' }}
+                            <div>
+                                {{ if _field:hide_display }}
+                                    <label class="sr-only"
+                                           :for="'{{ _fieldHandle }}_' + index + '_{{ _field:handle }}'">
+                                        {{ _field:display }}
+                                    </label>
+                                {{ elseif _field:type !== 'radio' && _field:type !== 'checkboxes' }}
+                                    <label :for="'{{ _fieldHandle }}_' + index + '_{{ _field:handle }}'">
+                                        {{ _field:display }}
+                                    </label>
+                                {{ /if }}
+
+                                {{ if _field:instructions && _field:instructions_position === 'above' }}
+                                <div class="text-sm text-gray-500">{{ _field:instructions }}</div>
+                                {{ /if }}
+                            </div>
+
+                            <div>{{ _field:field }}</div>
+
+                            <template x-if="hasError(index, '{{ _field:handle }}')">
+                                <p class="text-red-600"
+                                   x-text="errors[index]['{{ _field:handle }}']"/>
+                            </template>
+                        {{ /if }}
+                    </div>
+                {{ /set_fields }}
+                </div>
+
+                <div class="flex-shrink-0">
+                    {{# CLOSE BUTTON #}}
+                    <button @click.prevent="remove(index)"
+                            class="border border-gray-500 rounded py-1 px-5">
+                        {{ delete_row }}
+                    </button>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <div>
+        <button @click.prevent="add"
+                :disabled="!canAddSet"
+                class="border border-gray-500 rounded py-1 px-5">
+            {{ add_row }}
+        </button>
+    </div>
+</div>

@@ -1,0 +1,33 @@
+<table cellpadding="0" cellspacing="0" border="0" style="width:100%" width="100%">
+    {{ data | scope("_row") }}
+    <tr>
+        <td style="padding-top:5px"><strong>{{ heading }} {{ index + 1 }}</strong></td>
+    </tr>
+    <tr>
+        <td style="vertical-align:top; padding:2px 22px 0px">
+            {{ template | scope("_template") }}
+            <table cellpadding="0" cellspacing="0" border="0" style="width:100%" width="100%">
+                <tr>
+                    {{ _template | scope("_cell") }}
+                    <td style="padding-top:2px; vertical-align:top; width: {{ _cell:field:width ?? 100 }}%"
+                        width="{{ _cell:field:width ?? 100 }}%">
+                        {{ if _cell:field:type !== 'spacer' }}
+                        <strong>{{ _cell:field:display }}</strong><br>
+
+                        {{ _value = _row[_cell:handle] ?? '' }}
+                        {{ if _value | is_array }}
+                        {{ _value | join(", ") }}
+                        {{ else }}
+                        {{ _value }}
+                        {{ /if }}
+
+                        {{ /if }}
+                    </td>
+                    {{ /_template }}
+                </tr>
+            </table>
+            {{ /template }}
+        </td>
+    </tr>
+    {{ /data }}
+</table>

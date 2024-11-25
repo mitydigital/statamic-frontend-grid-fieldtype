@@ -1,0 +1,12 @@
+{
+  "resources/css/frontend-grid.css": {
+    "file": "assets/frontend-grid-3b2e67e6.css",
+    "isEntry": true,
+    "src": "resources/css/frontend-grid.css"
+  },
+  "resources/js/cp.js": {
+    "file": "assets/cp-e77c6c6a.js",
+    "isEntry": true,
+    "src": "resources/js/cp.js"
+  }
+}
