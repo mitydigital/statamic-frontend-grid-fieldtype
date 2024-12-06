@@ -3,7 +3,7 @@
 <!-- statamic:hide -->
 
 ![Statamic 5](https://img.shields.io/badge/Statamic-5.0-FF269E?style=for-the-badge&link=https://statamic.com)
-[![Frontend Grid Fieldtype for Statamic on Packagist](https://img.shields.io/packagist/v/mitydigital/statamic-variable-number-fieldtype?style=for-the-badge)](https://packagist.org/packages/mitydigital/statamic-frontend-grid-fieldtype/stats)
+[![Frontend Grid Fieldtype for Statamic on Packagist](https://img.shields.io/packagist/v/mitydigital/statamic-frontend-grid-fieldtype?style=for-the-badge)](https://packagist.org/packages/mitydigital/statamic-frontend-grid-fieldtype/stats)
 
 ---
 

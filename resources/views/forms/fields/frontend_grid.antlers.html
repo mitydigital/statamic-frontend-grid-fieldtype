@@ -74,7 +74,8 @@
         <button @click.prevent="add"
                 :disabled="!canAddSet"
                 class="border border-gray-500 rounded py-1 px-5">
-            {{ add_row }}
+            <span x-show="sets.length === 0">{{ add_row }}</span>
+            <span x-cloak x-show="sets.length > 0">{{ add_next_row }}</span>
         </button>
     </div>
 </div>
