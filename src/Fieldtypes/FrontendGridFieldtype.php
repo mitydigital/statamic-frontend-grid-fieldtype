@@ -73,8 +73,13 @@ class FrontendGridFieldtype extends Fieldtype
                         'type' => 'integer',
                     ],
                     'add_row' => [
-                        'display' => __('Add Row Label'),
-                        'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
+                        'display' => __('statamic-frontend-grid-fieldtype::fieldtype.config.add_row.display'),
+                        'instructions' => __('statamic-frontend-grid-fieldtype::fieldtype.config.add_row.instructions'),
+                        'type' => 'text',
+                    ],
+                    'add_next_row' => [
+                        'display' => __('statamic-frontend-grid-fieldtype::fieldtype.config.add_next_row.display'),
+                        'instructions' => __('statamic-frontend-grid-fieldtype::fieldtype.config.add_next_row.instructions'),
                         'type' => 'text',
                     ],
                     'delete_row' => [
@@ -180,7 +185,7 @@ class FrontendGridFieldtype extends Fieldtype
                 }
 
                 //if ($chk) {
-                    //dd($markup);
+                //dd($markup);
                 //}
 
                 if (false) {
@@ -241,6 +246,7 @@ class FrontendGridFieldtype extends Fieldtype
             'set_fields' => $setFields,
 
             'add_row' => $this->config('add_row', __('Add')),
+            'add_next_row' => $this->config('add_next_row', $this->config('add_row', __('Add'))),
             'delete_row' => $this->config('delete_row', __('Delete')),
         ];
     }
@@ -282,18 +288,18 @@ class FrontendGridFieldtype extends Fieldtype
 
         $fieldRules = Arr::get($this->field()->config(), 'validate', []);
 
-        if (!in_array('array', $fieldRules)) {
+        if (! in_array('array', $fieldRules)) {
             $fieldRules[] = 'array';
         }
 
-        $hasMin = collect($fieldRules)->filter(fn(string $rule) => Str::startsWith($rule, 'min:'))->count() ? true : false;
-        $hasMax = collect($fieldRules)->filter(fn(string $rule) => Str::startsWith($rule, 'max:'))->count() ? true : false;
+        $hasMin = collect($fieldRules)->filter(fn (string $rule) => Str::startsWith($rule, 'min:'))->count() ? true : false;
+        $hasMax = collect($fieldRules)->filter(fn (string $rule) => Str::startsWith($rule, 'max:'))->count() ? true : false;
 
-        if (!$hasMin && $minRows = Arr::get($this->field()->config(), 'min_rows', null)) {
+        if (! $hasMin && $minRows = Arr::get($this->field()->config(), 'min_rows', null)) {
             $fieldRules[] = 'min:'.$minRows;
         }
 
-        if (!$hasMax && $maxRows = Arr::get($this->field()->config(), 'max_rows', null)) {
+        if (! $hasMax && $maxRows = Arr::get($this->field()->config(), 'max_rows', null)) {
             $fieldRules[] = 'max:'.$maxRows;
         }
 
