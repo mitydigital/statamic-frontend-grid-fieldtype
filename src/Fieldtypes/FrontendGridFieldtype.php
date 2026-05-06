@@ -10,6 +10,7 @@ use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Validator;
+use Statamic\Forms\JsDrivers\Alpine;
 use Statamic\Tags\Concerns\RendersForms;
 
 class FrontendGridFieldtype extends Fieldtype
@@ -114,10 +115,15 @@ class FrontendGridFieldtype extends Fieldtype
             $scope = $scope.'.';
         }
 
+        $driver = new Alpine($this->field->form());
+
         // set fields
         $setFields = $fields
-            ->map(function (array $config) use ($fieldHandle, $scope) {
-                $field = $this->getRenderableField(new Field($config['handle'], $config['field']));
+            ->map(function (array $config) use ($fieldHandle, $scope, $driver) {
+
+                $field = new Field($config['handle'], $config['field']);
+
+                $field = array_merge($this->getRenderableField($field), $driver->addToRenderableFieldData($field, []));
 
                 $handle = $config['handle'];
                 $markup = Arr::get($field, 'field', '');
@@ -244,6 +250,7 @@ class FrontendGridFieldtype extends Fieldtype
             'set_default' => $setDefault,
             'set_errors' => $setErrors,
             'set_fields' => $setFields,
+            'fields' => [], // otherwise it cracks it with Statamic 6
 
             'add_row' => $this->config('add_row', __('Add')),
             'add_next_row' => $this->config('add_next_row', $this->config('add_row', __('Add'))),
